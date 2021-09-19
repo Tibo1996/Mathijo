@@ -1,0 +1,75 @@
+﻿.firstRow {
+    margin-top: 0.6%;
+}
+
+.allButtonsForDishes {
+    margin-top: 1%;
+    border-top: 2px solid black;
+    padding-top: 0.8%;
+}
+
+.btnDishes {
+    margin: 1%;
+    width: 18%;
+    height: 100px;
+}
+
+.chooseTable {
+    margin-left: 1%;
+}
+
+.btnTables {
+    margin: 0.3%;
+}
+
+.orderPart {
+    border-left: 1px solid black;
+}
+
+.otherOrderPart{
+    border-right: 1px solid black;
+}
+
+.backButton {
+    float: right;
+    margin: 0.3%;
+}
+
+.allDishes {
+    display: none;
+}
+
+.productTable {
+    margin-top: 3.5%;
+}
+
+.productTableBorder {
+    border-top: 2px solid black;
+    margin-top: 1%;
+}
+
+.orderHeader {
+    padding: 2.5%;
+    font-size: 1.2rem;
+    border-bottom: 2px solid black;
+}
+
+.my-custom-scrollbar1 {
+    margin-top: 1.5%;
+    height: 75vh;
+    overflow: auto;
+}
+
+.my-custom-scrollbar2 {
+    margin-top: 1.5%;
+    height: 55vh;
+    overflow: auto;
+}
+
+.sumRows{
+    padding: 2vh 2vh 2vh 2vh;
+    background-color: lightgray;
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    margin-top: 2.8%;
+}
