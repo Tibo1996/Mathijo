@@ -17,6 +17,12 @@ function Init() {
                     onclick: 'GetProducts(this)'
                 }).appendTo('.allButtonsForDishes');
             }
+            $('<button/>', {
+                type: 'button',
+                text: 'Admin',
+                class: 'btn btn-danger btnDishes',
+                onclick: 'GoToAdmin()'
+            }).appendTo('.allButtonsForDishes');
         }
     });
     $.ajax({
@@ -340,4 +346,8 @@ function ClearSubTotal() {
 
 function SetSubTotalToZero() {
     $("#subtotalAmount").html("0.00 €");
+}
+
+function GoToAdmin() {
+    location.href = "/Home/ProduktArten";
 }

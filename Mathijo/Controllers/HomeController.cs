@@ -16,5 +16,35 @@ namespace Mathijo.Controllers
         {
             return View();
         }
+
+        public IActionResult BestellteProdukte()
+        {
+            return View();
+        }
+
+        public IActionResult Bestellungen()
+        {
+            return View();
+        }
+
+        public IActionResult Produktarten()
+        {
+            return View();
+        }
+
+        public IActionResult Produkte()
+        {
+            return View();
+        }
+
+        public IActionResult Tische()
+        {
+            return View();
+        }
+
+        public IActionResult Umsatz()
+        {
+            return View();
+        }
     }
 }
