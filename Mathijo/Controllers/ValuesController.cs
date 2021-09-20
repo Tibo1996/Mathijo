@@ -145,12 +145,12 @@ namespace Mathijo.Controllers
         {
             float gesamterUmsatz = 0.00f;
             IEnumerable<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>();
-            foreach(W_Bestellungen bestellung in bestellungen)
+            foreach (W_Bestellungen bestellung in bestellungen)
             {
-                W_Bestellte_Produkte bestelltesProduktTemplate = new W_Bestellte_Produkte();
+                W_Bestellte_Produkte bestelltesProduktTemplate = new();
                 bestelltesProduktTemplate.ID_Bestellung = bestellung.ID;
                 IEnumerable<W_Bestellte_Produkte> bestellteProdukte = DBHelper.Select<W_Bestellte_Produkte>(bestelltesProduktTemplate);
-                foreach(W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
+                foreach (W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
                 {
                     S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
                     gesamterUmsatz += float.Parse((produkt.Preis * bestelltesProdukt.Menge).ToString());
@@ -167,8 +167,10 @@ namespace Mathijo.Controllers
                 .Where(x => x.Bestelldatum > dateFrom && x.Bestelldatum < dateUntil);
             foreach (W_Bestellungen bestellung in bestellungen)
             {
-                W_Bestellte_Produkte bestelltesProduktTemplate = new W_Bestellte_Produkte();
-                bestelltesProduktTemplate.ID_Bestellung = bestellung.ID;
+                W_Bestellte_Produkte bestelltesProduktTemplate = new()
+                {
+                    ID_Bestellung = bestellung.ID
+                };
                 IEnumerable<W_Bestellte_Produkte> bestellteProdukte = DBHelper.Select<W_Bestellte_Produkte>(bestelltesProduktTemplate);
                 foreach (W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
                 {
@@ -179,6 +181,14 @@ namespace Mathijo.Controllers
             return gesamterUmsatz;
         }
 
-
+        [HttpGet("GetOrderedProductsPerOrder")]
+        public IEnumerable<object> GetOrderedProductsPerOrder(Guid idOrder)
+        {
+            W_Bestellte_Produkte bestelltesProdukt = new()
+            {
+                ID_Bestellung = idOrder
+            };
+            return DBHelper.Select<W_Bestellte_Produkte>(bestelltesProdukt);
+        }
     }
 }
