@@ -133,5 +133,52 @@ namespace Mathijo.Controllers
             bestelltesProdukt.Bezahlt = true;
             DBHelper.Update(bestelltesProdukt);
         }
+
+        [HttpGet("GetAllOrderedProducts")]
+        public IEnumerable<object> GetAllOrderedProducts()
+        {
+            return DBHelper.SelectAll<W_Bestellte_Produkte>();
+        }
+
+        [HttpGet("GetUmsatzGesamt")]
+        public float GetUmsatzGesamt()
+        {
+            float gesamterUmsatz = 0.00f;
+            IEnumerable<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>();
+            foreach(W_Bestellungen bestellung in bestellungen)
+            {
+                W_Bestellte_Produkte bestelltesProduktTemplate = new W_Bestellte_Produkte();
+                bestelltesProduktTemplate.ID_Bestellung = bestellung.ID;
+                IEnumerable<W_Bestellte_Produkte> bestellteProdukte = DBHelper.Select<W_Bestellte_Produkte>(bestelltesProduktTemplate);
+                foreach(W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
+                {
+                    S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
+                    gesamterUmsatz += float.Parse((produkt.Preis * bestelltesProdukt.Menge).ToString());
+                }
+            }
+            return gesamterUmsatz;
+        }
+
+        [HttpGet("GetUmsatzBetweenTime")]
+        public float GetUmsatzBetweenTime(DateTime dateFrom, DateTime dateUntil)
+        {
+            float gesamterUmsatz = 0.00f;
+            IEnumerable<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>()
+                .Where(x => x.Bestelldatum > dateFrom && x.Bestelldatum < dateUntil);
+            foreach (W_Bestellungen bestellung in bestellungen)
+            {
+                W_Bestellte_Produkte bestelltesProduktTemplate = new W_Bestellte_Produkte();
+                bestelltesProduktTemplate.ID_Bestellung = bestellung.ID;
+                IEnumerable<W_Bestellte_Produkte> bestellteProdukte = DBHelper.Select<W_Bestellte_Produkte>(bestelltesProduktTemplate);
+                foreach (W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
+                {
+                    S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
+                    gesamterUmsatz += float.Parse((produkt.Preis * bestelltesProdukt.Menge).ToString());
+                }
+            }
+            return gesamterUmsatz;
+        }
+
+
     }
 }
