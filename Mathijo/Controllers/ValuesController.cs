@@ -17,13 +17,13 @@ namespace Mathijo.Controllers
         [HttpGet("GetAllProductTypes")]
         public IEnumerable<object> GetAllProductTypes()
         {
-            return DBHelper.SelectAll<S_Produkt_Arten>().OrderBy(x => x.Reihenfolge);
+            return DBHelper.SelectAll<S_Produkt_Arten>().Where(x => x.Geloescht == false).OrderBy(x => x.Reihenfolge);
         }
 
         [HttpGet("GetTables")]
         public IEnumerable<object> GetTables()
         {
-            return DBHelper.SelectAll<S_Tische>().OrderBy(x => x.Tischnummer);
+            return DBHelper.SelectAll<S_Tische>().Where(x => x.Geloescht == false).OrderBy(x => x.Tischnummer);
         }
 
         [HttpPost("GetProductsOfProductType")]
@@ -31,7 +31,7 @@ namespace Mathijo.Controllers
         {
             S_Produkte produkt = new();
             produkt.ID_Produkt_Art = idProductType;
-            return DBHelper.Select(produkt);
+            return DBHelper.Select(produkt).Where(x => x.Geloescht == false);
         }
 
         [HttpPost("CreateNewOrder")]
@@ -189,6 +189,34 @@ namespace Mathijo.Controllers
                 ID_Bestellung = idOrder
             };
             return DBHelper.Select<W_Bestellte_Produkte>(bestelltesProdukt);
+        }
+
+        [HttpGet("CreateNewProductType")]
+        public Guid? CreateNewProductType(string productTypeName)
+        {
+            S_Produkt_Arten produktArt = new S_Produkt_Arten()
+            {
+                ID = Guid.NewGuid(),
+                Produkt_Art = productTypeName,
+                Reihenfolge = DBHelper.SelectAll<S_Produkt_Arten>().Count(),
+                Geloescht = false
+            };
+            DBHelper.Insert(produktArt);
+            return produktArt.ID;
+        }
+
+        [HttpGet("DeleteProductType")]
+        public void DeleteProductType(Guid idProductType)
+        {
+            DBHelper.Delete<S_Produkt_Arten>(idProductType);
+        }
+
+        [HttpGet("UpdateProductType")]
+        public void UpdateProductType(string productTypeName, Guid idProductType)
+        {
+            S_Produkt_Arten produktArt = DBHelper.SelectByID<S_Produkt_Arten>(idProductType);
+            produktArt.Produkt_Art = productTypeName;
+            DBHelper.Update(produktArt);
         }
     }
 }

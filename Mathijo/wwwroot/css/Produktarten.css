@@ -1,1 +1,4 @@
-﻿
+﻿.scrollbarProductTypes {
+    height: 63vh;
+    overflow: auto;
+}

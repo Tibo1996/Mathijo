@@ -8,10 +8,9 @@ function Init() {
         async: false,
         success: function (productTypes) {
             for (let i = 0; i < productTypes.length; i++) {
-                let productName = productTypes[i].produkt_Art.replace(/_/g, ' ');
                 $('<button/>', {
                     type: 'button',
-                    text: productName,
+                    text: productTypes[i].produkt_Art,
                     class: 'btn btn-primary btnDishes',
                     id: productTypes[i].id,
                     onclick: 'GetProducts(this)'
@@ -349,5 +348,5 @@ function SetSubTotalToZero() {
 }
 
 function GoToAdmin() {
-    location.href = "/Home/ProduktArten";
+    location.href = "/Home/Produktarten";
 }
