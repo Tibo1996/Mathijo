@@ -4,6 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
     <ApplicationIcon>wwwroot\Resources\Mathijo-Icon.ico</ApplicationIcon>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +18,9 @@
     <Reference Include="DatabaseHelper">
       <HintPath>DLLs\DatabaseHelper.dll</HintPath>
     </Reference>
+    <Reference Include="ExceptionFramework">
+      <HintPath>DLLs\ExceptionFramework.dll</HintPath>
+    </Reference>
     <Reference Include="MathijoAssembly">
       <HintPath>DLLs\MathijoAssembly.dll</HintPath>
     </Reference>
@@ -24,6 +28,10 @@
 
   <ItemGroup>
     <Folder Include="Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\ZAModalFramework.js" />
   </ItemGroup>
 
 </Project>

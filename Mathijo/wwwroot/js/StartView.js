@@ -1,6 +1,12 @@
 ﻿window.onload = Init;
 var tableOrderNumber;
 var productsInSubTotal = [];
+var ecsNoTable = {
+    "displayableMessage": "Wählen Sie zuerst einen Tisch aus!",
+    "title": "Fehler",
+    "code": 2,
+    "displayType": 2
+}
 
 function Init() {
     $.ajax({
@@ -80,7 +86,7 @@ function GetProducts(button) {
 
 function AddToOrder(button) {
     if ($("#idOfOrder").attr("id") === "idOfOrder") {
-        alert("Suchen Sie erst einen Tisch aus");
+        requestStatusModal(ecsNoTable);
     }
     else {
         let alreadyExists = false;

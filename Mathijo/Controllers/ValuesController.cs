@@ -1,4 +1,5 @@
 ﻿using DatabaseHelper;
+using ExceptionFramework;
 using MathijoAssembly;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,6 +11,10 @@ using System.Threading.Tasks;
 namespace Mathijo.Controllers
 {
     public record OrderData(Guid ID_Produkt, Guid ID_Bestellung);
+    public record ProductData(string ProductName, decimal Prize, Guid IDProductType);
+    public record ProductDataWithID(string ProductName, decimal Prize, Guid IDProduct);
+    public record GuidAndECS(Guid? NewID, ExceptionCheckState Ecs);
+
     [ApiController]
     [Route("[controller]")]
     public class ValuesController : Controller
@@ -192,31 +197,154 @@ namespace Mathijo.Controllers
         }
 
         [HttpGet("CreateNewProductType")]
-        public Guid? CreateNewProductType(string productTypeName)
+        public GuidAndECS CreateNewProductType(string productTypeName)
         {
-            S_Produkt_Arten produktArt = new S_Produkt_Arten()
+            try
             {
-                ID = Guid.NewGuid(),
-                Produkt_Art = productTypeName,
-                Reihenfolge = DBHelper.SelectAll<S_Produkt_Arten>().Count(),
-                Geloescht = false
-            };
-            DBHelper.Insert(produktArt);
-            return produktArt.ID;
+                S_Produkt_Arten produktArt = new()
+                {
+                    ID = Guid.NewGuid(),
+                    Produkt_Art = productTypeName,
+                    Reihenfolge = DBHelper.SelectAll<S_Produkt_Arten>().Count(),
+                    Geloescht = false
+                };
+                string worked = DBHelper.Insert(produktArt);
+                if (worked == "Worked")
+                {
+                    return new GuidAndECS(produktArt.ID, new ExceptionCheckState("", "Neue Produktart erfolgreich hinzugefügt", "Erfolgreich", _Status.Ok, DisplayType.DialogOnly));
+                }
+                else
+                {
+                    return new GuidAndECS(Guid.Empty, new ExceptionCheckState("", worked, "Fehler", _Status.Error, DisplayType.DialogOnly));
+                }
+
+            }
+            catch (Exception exc)
+            {
+                return new GuidAndECS(Guid.Empty, new ExceptionCheckState("", exc.Message, "Fehler", _Status.Error, DisplayType.DialogOnly));
+            }
         }
 
         [HttpGet("DeleteProductType")]
-        public void DeleteProductType(Guid idProductType)
+        public ExceptionCheckState DeleteProductType(Guid idProductType)
         {
-            DBHelper.Delete<S_Produkt_Arten>(idProductType);
+            try
+            {
+                string worked = DBHelper.Delete<S_Produkt_Arten>(idProductType);
+                if (worked == "Worked")
+                {
+                    return new ExceptionCheckState("", "Produktart erfolgreich gelöscht", "Erfolgreich", _Status.Ok, DisplayType.DialogOnly);
+                }
+                else
+                {
+                    return new ExceptionCheckState("", worked, "Fehler", _Status.Error, DisplayType.DialogOnly);
+                }
+            }
+            catch (Exception exc)
+            {
+                return new ExceptionCheckState("", exc.Message, "Fehler", _Status.Error, DisplayType.DialogOnly);
+            }
+
         }
 
         [HttpGet("UpdateProductType")]
-        public void UpdateProductType(string productTypeName, Guid idProductType)
+        public ExceptionCheckState UpdateProductType(string productTypeName, Guid idProductType)
         {
-            S_Produkt_Arten produktArt = DBHelper.SelectByID<S_Produkt_Arten>(idProductType);
-            produktArt.Produkt_Art = productTypeName;
-            DBHelper.Update(produktArt);
+            try
+            {
+                S_Produkt_Arten produktArt = DBHelper.SelectByID<S_Produkt_Arten>(idProductType);
+                produktArt.Produkt_Art = productTypeName;
+                string worked = DBHelper.Update(produktArt);
+                if (worked == "Worked")
+                {
+                    return new ExceptionCheckState("", "Produktarten erfolgreich aktualisiert", "Erfolgreich", _Status.Ok, DisplayType.DialogOnly);
+                }
+                else
+                {
+                    return new ExceptionCheckState("", worked, "Fehler", _Status.Error, DisplayType.DialogOnly);
+                }
+            }
+            catch (Exception exc)
+            {
+                return new ExceptionCheckState("", exc.Message, "Fehler", _Status.Error, DisplayType.DialogOnly);
+            }
+
+        }
+
+        [HttpPost("CreateNewProduct")]
+        public GuidAndECS CreateNewProduct(ProductData productData)
+        {
+            try
+            {
+                S_Produkte produkt = new()
+                {
+                    ID = Guid.NewGuid(),
+                    ID_Produkt_Art = productData.IDProductType,
+                    Preis = productData.Prize,
+                    ProduktName = productData.ProductName,
+                    Geloescht = false
+                };
+                string worked = DBHelper.Insert(produkt);
+                if (worked == "Worked")
+                {
+                    return new GuidAndECS(produkt.ID, new ExceptionCheckState("", "Neues Produkt erfolgreich hinzugefügt", "Erfolgreich", _Status.Ok, DisplayType.DialogOnly));
+                }
+                else
+                {
+                    return new GuidAndECS(Guid.Empty, new ExceptionCheckState("", worked, "Fehler", _Status.Error, DisplayType.DialogOnly));
+
+                }
+            }
+            catch (Exception exc)
+            {
+                return new GuidAndECS(Guid.Empty, new ExceptionCheckState("", exc.Message, "Fehler", _Status.Error, DisplayType.DialogOnly));
+            }
+
+        }
+
+        [HttpGet("DeleteProduct")]
+        public ExceptionCheckState DeleteProduct(Guid idProduct)
+        {
+            try
+            {
+                string worked = DBHelper.Delete<S_Produkte>(idProduct);
+                if (worked == "Worked")
+                {
+                    return new ExceptionCheckState("", "Produkt erfolgreich gelöscht", "Erfolgreich", _Status.Ok, DisplayType.DialogOnly);
+                }
+                else
+                {
+                    return new ExceptionCheckState("", worked, "Fehler", _Status.Error, DisplayType.DialogOnly);
+                }
+            }
+            catch (Exception exc)
+            {
+                return new ExceptionCheckState("", exc.Message, "Fehler", _Status.Error, DisplayType.DialogOnly);
+            }
+        }
+
+        [HttpPost("UpdateProduct")]
+        public ExceptionCheckState UpdateProduct(ProductDataWithID productData)
+        {
+            try
+            {
+                S_Produkte produkt = DBHelper.SelectByID<S_Produkte>(productData.IDProduct);
+                produkt.ProduktName = productData.ProductName;
+                produkt.Preis = productData.Prize;
+                string worked = DBHelper.Update(produkt);
+                if (worked == "Worked")
+                {
+                    return new ExceptionCheckState("", "Produkte erfolgreich aktualisiert", "Erfolgreich", _Status.Ok, DisplayType.DialogOnly);
+                }
+                else
+                {
+                    return new ExceptionCheckState("", worked, "Fehler", _Status.Error, DisplayType.DialogOnly);
+                }
+            }
+            catch(Exception exc)
+            {
+                return new ExceptionCheckState("", exc.Message, "Fehler", _Status.Error, DisplayType.DialogOnly);
+            }
         }
     }
 }

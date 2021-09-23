@@ -1,4 +1,10 @@
 ﻿window.onload = init;
+var ecsDelete = {
+    "displayableMessage": "Wollen Sie diese Produktart wirklich löschen?",
+    "title": "Warnung",
+    "code": 1,
+    "displayType": 2
+}
 
 function init() {
     $.ajax({
@@ -22,15 +28,17 @@ function init() {
 
 function SaveChangesProductType() {
     let rowInfo = $("#productTypesTable tr");
+    let ecsInfo;
     for (var i = 1; i < rowInfo.length; i++) {
         $.ajax({
             url: "/Values/UpdateProductType" + "?" + $.param({ "productTypeName": rowInfo[i].firstChild.innerHTML, "idProductType": rowInfo[i].id }),
             async: false,
-            success: function () { 
+            success: function (ecs) {
+                ecsInfo = ecs;
             }
         })
     }
-    location.reload();
+    requestStatusModal(ecsInfo);
 }
 
 function AddNewProductType() {
@@ -38,29 +46,38 @@ function AddNewProductType() {
     $.ajax({
         url: "/Values/CreateNewProductType" + "?" + $.param({ "productTypeName": newProductType }),
         async: false,
-        success: function (newID) {
-            $('<tr/>', {
-                id: newID
-            }).appendTo('.tableProductTypes');
-            let createdTD = document.createElement("td");
-            createdTD.setAttribute("contenteditable", "true");
-            createdTD.innerHTML = newProductType;
-            document.getElementById(newID).appendChild(createdTD);
-            $('<td/>', {
-                html: '<button class="btn btn-danger" style="padding-top: 5px; padding-bottom: 8px;" onclick="DeleteRowProductType(this)"><b>-</b></button>'
-            }).appendTo('#' + newID);
-            location.reload();
+        success: function (guidAndECS) {
+            if (guidAndECS.ecs.code === 0) {
+                $('<tr/>', {
+                    id: guidAndECS.newID
+                }).appendTo('.tableProductTypes');
+                let createdTD = document.createElement("td");
+                createdTD.setAttribute("contenteditable", "true");
+                createdTD.innerHTML = newProductType;
+                document.getElementById(guidAndECS.newID).appendChild(createdTD);
+                $('<td/>', {
+                    html: '<button class="btn btn-danger" style="padding-top: 5px; padding-bottom: 8px;" onclick="DeleteRowProductType(this)"><b>-</b></button>'
+                }).appendTo('#' + guidAndECS.newID);
+                $("#newEnteredProductType").val("");
+            }
+            requestStatusModal(guidAndECS.ecs);
         }
     })
 }
 
 function DeleteRowProductType(row) {
     let idOfProductType = row.parentElement.parentElement.id;
-    $.ajax({
-        url: "/Values/DeleteProductType" + "?" + $.param({ "idProductType": idOfProductType }),
-        async: false,
-        success: function () {
-            $("#" + row.parentElement.parentElement.id).remove();
-        }
+    requestYesNoModal(ecsDelete, function () {
+        $.ajax({
+            url: "/Values/DeleteProductType" + "?" + $.param({ "idProductType": idOfProductType }),
+            async: false,
+            success: function (ecs) {
+                if (ecs.code === 0) {
+                    $("#" + row.parentElement.parentElement.id).remove();
+                }
+                requestStatusModal(ecs);
+            }
+        })
     })
+
 }
