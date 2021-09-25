@@ -14,6 +14,8 @@ namespace Mathijo.Controllers
     public record ProductData(string ProductName, decimal Prize, Guid IDProductType);
     public record ProductDataWithID(string ProductName, decimal Prize, Guid IDProduct);
     public record GuidAndECS(Guid? NewID, ExceptionCheckState Ecs);
+    public record AllOrdersAndOrderedProducts(Guid ID_Order, int TableNumber, DateTime Date, List<ProductDataForAllOrders> OrderedProducts, decimal TotalPrize);
+    public record ProductDataForAllOrders(int Amount, string ProductName, decimal Prize);
 
     [ApiController]
     [Route("[controller]")]
@@ -137,63 +139,6 @@ namespace Mathijo.Controllers
             W_Bestellte_Produkte bestelltesProdukt = DBHelper.SelectByID<W_Bestellte_Produkte>(idOrderedProduct);
             bestelltesProdukt.Bezahlt = true;
             DBHelper.Update(bestelltesProdukt);
-        }
-
-        [HttpGet("GetAllOrderedProducts")]
-        public IEnumerable<object> GetAllOrderedProducts()
-        {
-            return DBHelper.SelectAll<W_Bestellte_Produkte>();
-        }
-
-        [HttpGet("GetUmsatzGesamt")]
-        public float GetUmsatzGesamt()
-        {
-            float gesamterUmsatz = 0.00f;
-            IEnumerable<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>();
-            foreach (W_Bestellungen bestellung in bestellungen)
-            {
-                W_Bestellte_Produkte bestelltesProduktTemplate = new();
-                bestelltesProduktTemplate.ID_Bestellung = bestellung.ID;
-                IEnumerable<W_Bestellte_Produkte> bestellteProdukte = DBHelper.Select<W_Bestellte_Produkte>(bestelltesProduktTemplate);
-                foreach (W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
-                {
-                    S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
-                    gesamterUmsatz += float.Parse((produkt.Preis * bestelltesProdukt.Menge).ToString());
-                }
-            }
-            return gesamterUmsatz;
-        }
-
-        [HttpGet("GetUmsatzBetweenTime")]
-        public float GetUmsatzBetweenTime(DateTime dateFrom, DateTime dateUntil)
-        {
-            float gesamterUmsatz = 0.00f;
-            IEnumerable<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>()
-                .Where(x => x.Bestelldatum > dateFrom && x.Bestelldatum < dateUntil);
-            foreach (W_Bestellungen bestellung in bestellungen)
-            {
-                W_Bestellte_Produkte bestelltesProduktTemplate = new()
-                {
-                    ID_Bestellung = bestellung.ID
-                };
-                IEnumerable<W_Bestellte_Produkte> bestellteProdukte = DBHelper.Select<W_Bestellte_Produkte>(bestelltesProduktTemplate);
-                foreach (W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
-                {
-                    S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
-                    gesamterUmsatz += float.Parse((produkt.Preis * bestelltesProdukt.Menge).ToString());
-                }
-            }
-            return gesamterUmsatz;
-        }
-
-        [HttpGet("GetOrderedProductsPerOrder")]
-        public IEnumerable<object> GetOrderedProductsPerOrder(Guid idOrder)
-        {
-            W_Bestellte_Produkte bestelltesProdukt = new()
-            {
-                ID_Bestellung = idOrder
-            };
-            return DBHelper.Select<W_Bestellte_Produkte>(bestelltesProdukt);
         }
 
         [HttpGet("CreateNewProductType")]
@@ -345,6 +290,84 @@ namespace Mathijo.Controllers
             {
                 return new ExceptionCheckState("", exc.Message, "Fehler", _Status.Error, DisplayType.DialogOnly);
             }
+        }
+
+        [HttpGet("CreateNewTable")]
+        public GuidAndECS CreateNewTable(int tableNumber)
+        {
+            try
+            {
+                S_Tische tisch = new()
+                {
+                    ID = Guid.NewGuid(),
+                    Tischnummer = tableNumber,
+                    Geloescht = false
+                };
+                string worked = DBHelper.Insert(tisch);
+                if (worked == "Worked")
+                {
+                    return new GuidAndECS(tisch.ID, new ExceptionCheckState("", "Neuer Tisch erfolgreich hinzugefügt", "Erfolgreich", _Status.Ok, DisplayType.DialogOnly));
+                }
+                else
+                {
+                    return new GuidAndECS(Guid.Empty, new ExceptionCheckState("", worked, "Fehler", _Status.Error, DisplayType.DialogOnly));
+
+                }
+            }
+            catch (Exception exc)
+            {
+                return new GuidAndECS(Guid.Empty, new ExceptionCheckState("", exc.Message, "Fehler", _Status.Error, DisplayType.DialogOnly));
+            }
+
+        }
+
+        [HttpGet("DeleteTable")]
+        public ExceptionCheckState DeleteTable(Guid idTable)
+        {
+            try
+            {
+                S_Tische tisch = DBHelper.SelectByID<S_Tische>(idTable);
+                tisch.Geloescht = true;
+                string worked = DBHelper.Update(tisch);
+                if (worked == "Worked")
+                {
+                    return new ExceptionCheckState("", "Tisch erfolgreich gelöscht", "Erfolgreich", _Status.Ok, DisplayType.DialogOnly);
+                }
+                else
+                {
+                    return new ExceptionCheckState("", worked, "Fehler", _Status.Error, DisplayType.DialogOnly);
+                }
+            }
+            catch (Exception exc)
+            {
+                return new ExceptionCheckState("", exc.Message, "Fehler", _Status.Error, DisplayType.DialogOnly);
+            }
+        }
+
+        [HttpGet("GetOrdersAndOrderedProducts")]
+        public IEnumerable<object> GetOrdersAndOrderedProducts(DateTime dateFrom, DateTime dateUntil)
+        {
+            List<AllOrdersAndOrderedProducts> listAllOrdersAndProducts = new();
+            List<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>().Where(x => x.Bestelldatum > dateFrom && x.Bestelldatum < dateUntil).ToList();
+            foreach(W_Bestellungen bestellung in bestellungen)
+            {
+                W_Bestellte_Produkte bestelltesProduktTemplate = new W_Bestellte_Produkte();
+                bestelltesProduktTemplate.ID_Bestellung = bestellung.ID;
+                List<W_Bestellte_Produkte> listBestellteProdukte = DBHelper.Select(bestelltesProduktTemplate).ToList();
+                List<ProductDataForAllOrders> listProductDataForAllOrders = new();
+                decimal totalPrize = 0;
+                foreach(W_Bestellte_Produkte bestelltesProdukt in listBestellteProdukte)
+                {
+                    S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
+                    ProductDataForAllOrders productDataForAllOrders = new((int)bestelltesProdukt.Menge, produkt.ProduktName, (decimal)produkt.Preis);
+                    listProductDataForAllOrders.Add(productDataForAllOrders);
+                    totalPrize += ((decimal)produkt.Preis * (int)bestelltesProdukt.Menge);
+                }
+                S_Tische tisch = DBHelper.SelectByID<S_Tische>((Guid)bestellung.ID_Tisch);
+                AllOrdersAndOrderedProducts allOrdersAndOrderedProducts = new((Guid)bestellung.ID, (int)tisch.Tischnummer, (DateTime)bestellung.Bestelldatum, listProductDataForAllOrders, totalPrize);
+                listAllOrdersAndProducts.Add(allOrdersAndOrderedProducts);
+            }
+            return listAllOrdersAndProducts;
         }
     }
 }

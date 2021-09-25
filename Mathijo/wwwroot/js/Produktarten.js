@@ -79,5 +79,4 @@ function DeleteRowProductType(row) {
             }
         })
     })
-
 }
