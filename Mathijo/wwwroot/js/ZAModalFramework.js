@@ -1,4 +1,5 @@
 ﻿var statusModalCounter = 0;
+
 function requestStatusModal(exceptionCheckState, closeEvent, colorcode) {
     if (exceptionCheckState.displayType == 0) {
         return;
@@ -7,10 +8,10 @@ function requestStatusModal(exceptionCheckState, closeEvent, colorcode) {
         console.log(exceptionCheckState.consoleMessage);
     }
     if (exceptionCheckState.displayType == 2 || exceptionCheckState.displayType == 3) {
-        // mit dialog
         createStatusModal(exceptionCheckState, closeEvent, colorcode);
     }
 }
+
 function requestYesNoModal(exceptionCheckState, yesEvent, noEvent, colorcode) {
     if (exceptionCheckState.displayType == 0) {
         return;
@@ -19,13 +20,12 @@ function requestYesNoModal(exceptionCheckState, yesEvent, noEvent, colorcode) {
         console.log(exceptionCheckState.consoleMessage);
     }
     if (exceptionCheckState.displayType == 2 || exceptionCheckState.displayType == 3) {
-        // mit dialog
         createYesNoModal(exceptionCheckState, yesEvent, noEvent, colorcode);
     }
 }
+
 function createStatusModal(exceptionCheckState, closeEvent, hexColorCode) {
     let modal = this.createModal(hexColorCode, exceptionCheckState.code);
-    //counter wird bei createModal um 1 erhöht
     let currentId = statusModalCounter - 1;
     let statusModalTitle = $('#statusModalTitle' + currentId + '');
     let statusModalBody = $('#statusModalBody' + currentId + '');
@@ -39,13 +39,8 @@ function createStatusModal(exceptionCheckState, closeEvent, hexColorCode) {
     modal.modal('show');
 }
 
-
-
-
-
 function createYesNoModal(exceptionCheckState, yesEvent, noEvent, hexColorCode) {
     let modal = this.createModal(hexColorCode, exceptionCheckState.code);
-    //counter wird bei createModal um 1 erhöht
     let currentId = statusModalCounter - 1;
     let statusModalTitle = $('#statusModalTitle' + currentId + '');
     let statusModalBody = $('#statusModalBody' + currentId + '');
@@ -62,11 +57,10 @@ function createYesNoModal(exceptionCheckState, yesEvent, noEvent, hexColorCode) 
     statusModalBody.text(exceptionCheckState.displayableMessage);
     modal.modal('show');
 }
+
 function assignCloseEventToButton(jqueryButton, modal, event) {
-    //Bitte kein Else, da sonst beim Fall typeof closeEvent != function überhaupt keine Aktion gesetzt wird!
     if (event != null) {
         if (typeof event == 'function') {
-            //Event für Nein :
             let closeAction = function CloseAction() {
                 closeModal(modal);
                 event();
@@ -87,11 +81,8 @@ function assignCloseEventToButton(jqueryButton, modal, event) {
         jqueryButton.click(closeAction);
     }
 }
+
 function createModal(hexColorCode, ecsCode) {
-
-
-
-    //HexColor wird präferiert.
     let modal = $('<div class="modal fade" id="statusModal' + statusModalCounter + '" tabindex="-1" role="dialog" aria-hidden="true">' +
         '<div class= "modal-dialog modal-dialog-centered" role = "document">' +
         '<div class="modal-content">' +
@@ -106,14 +97,10 @@ function createModal(hexColorCode, ecsCode) {
         '</div>');
     modal.appendTo(document.body);
     modal.on('hidden.bs.modal', function (e) {
-        //Jquery so machen, weil man dann alle statusModals erwischt.
-        //IDs sollten eigentlich einzigartig sein, aber wir vergeben die IDs ja nicht dynamisch
         $(this).detach();
     });
-    //Wenn man keinen Hex Color Code angibt, wird die Farbe anhand der statusMessage.code (Werte von 0-2 festgelegt);
     if (hexColorCode == null) {
         hexColorCode = this.getColorFromEcsCode(ecsCode);
-        //Ergebnis, wenn kein ecs Code vorhanden: Default-Wert ist rot!
     }
     let statusModalTitle = $('#statusModalTitle' + statusModalCounter + '');
     let statusModalBody = $('#statusModalBody' + statusModalCounter + '');
@@ -128,6 +115,7 @@ function createModal(hexColorCode, ecsCode) {
     statusModalCounter = statusModalCounter + 1;
     return modal;
 }
+
 function getColorFromEcsCode(ecsCode) {
     if (ecsCode == null || ecsCode >= 2) {
         //rot
@@ -142,14 +130,15 @@ function getColorFromEcsCode(ecsCode) {
         return '#f8c300';
     }
 }
+
 function selectTextColor(backgroundHex) {
-    //Textfarbe anhand der Hintergrundfarbe anpassen
     let rgb = this.hexToRgb(backgroundHex)
     const brightness = Math.round(((parseInt(rgb.r) * 299) +
         (parseInt(rgb.g) * 587) +
         (parseInt(rgb.b) * 114)) / 1000);
     return (brightness > 125) ? 'black' : 'white';
 }
+
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
@@ -158,12 +147,7 @@ function hexToRgb(hex) {
         b: parseInt(result[3], 16)
     } : null;
 }
-function getECS(consoleMessage, displayableMessage, title, statusCode, displayType, colorcode) {
-    return getExceptionCheckState(consoleMessage, displayableMessage, title, statusCode, displayType, colorcode);
-}
-function getExceptionCheckState(consoleMessage, displayableMessage, title, statusCode, displayType, colorcode) {
-    return { "consoleMessage": consoleMessage, "displayableMessage": displayableMessage, "title": title, "code": statusCode, "displayType": displayType, "color": colorcode }
-}
+
 function closeModal(modal) {
     modal.trigger('click.dismiss.bs.modal');
     modal.modal('hide');
