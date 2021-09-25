@@ -1,4 +1,5 @@
 ﻿function GetOrdersBetweenDates() {
+    $("#ordersTable").find("tr:gt(0)").remove();
     let dateFrom = $("#dateFrom").val();
     let dateUntil = $("#dateUntil").val();
     $.ajax({
