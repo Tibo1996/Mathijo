@@ -3,7 +3,6 @@
 <head>
     <link rel="shortcut icon" href="~/Resources/Mathijo-Icon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="~/css/BestellteProdukte.css" />
     <link rel="stylesheet" href="~/css/Common.css" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <title>Admin - Mathijo</title>
@@ -21,6 +20,29 @@
         </div>
     </nav>
     <div class="container-fluid mainPartOrder">
+        <center><h1>Bestellte Produkte</h1></center>
+        <div style="margin-left: 10px; margin-top: 25px;">
+            <label>Suchen von:</label>
+            <input id="dateFrom" type="datetime-local" style="margin-left: 5px; margin-right: 5px;" />
+            <label>bis:</label>
+            <input id="dateUntil" type="datetime-local" style="margin-left: 5px; margin-right: 5px;" />
+            <label>für Produktart:</label>
+            <select class="form-select" id="my_select" style="margin-top: 6px; margin-left: 5px"></select>
+            <button class="btn btn-success" onclick="GetOrdersBetweenDates()" style="margin-left: 15px; margin-bottom: 3px;">Suchen</button>
+        </div>
+        <div id="orderedProductsTable" class="tableDiv scrollbarCommon">
+            <table class="table table-striped table-hover" style="table-layout: fixed; word-wrap: break-word;">
+                <thead>
+                    <tr>
+                        <th scope="col" width="60%">Name</th>
+                        <th scope="col" width="20%" onclick="OrderTableByAmount()" style="cursor: pointer;">Verkaufte Menge</th>
+                        <th scope="col" width="20%" onclick="OrderTableByPrize()" style="cursor: pointer;">Gesamtumsatz</th>
+                    </tr>
+                </thead>
+                <tbody class="tableOrderedProducts">
+                </tbody>
+            </table>
+        </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>

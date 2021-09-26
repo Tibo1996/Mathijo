@@ -1,5 +1,6 @@
 ﻿using DatabaseHelper;
 using ExceptionFramework;
+using Mathijo.Models;
 using MathijoAssembly;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -120,6 +121,7 @@ namespace Mathijo.Controllers
         {
             W_Bestellungen bestellung = DBHelper.SelectByID<W_Bestellungen>(idOrder);
             bestellung.Abgeschlossen = true;
+            bestellung.Bestelldatum = DateTime.Now;
             W_Bestellte_Produkte bestelltesProdukt = new()
             {
                 ID_Bestellung = bestellung.ID
@@ -348,10 +350,10 @@ namespace Mathijo.Controllers
         public IEnumerable<object> GetOrdersAndOrderedProducts(DateTime dateFrom, DateTime dateUntil)
         {
             List<AllOrdersAndOrderedProducts> listAllOrdersAndProducts = new();
-            List<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>().Where(x => x.Bestelldatum > dateFrom && x.Bestelldatum < dateUntil).ToList();
+            List<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>().Where(x => x.Bestelldatum > dateFrom && x.Bestelldatum < dateUntil && x.Abgeschlossen == true).ToList();
             foreach(W_Bestellungen bestellung in bestellungen)
             {
-                W_Bestellte_Produkte bestelltesProduktTemplate = new W_Bestellte_Produkte();
+                W_Bestellte_Produkte bestelltesProduktTemplate = new();
                 bestelltesProduktTemplate.ID_Bestellung = bestellung.ID;
                 List<W_Bestellte_Produkte> listBestellteProdukte = DBHelper.Select(bestelltesProduktTemplate).ToList();
                 List<ProductDataForAllOrders> listProductDataForAllOrders = new();
@@ -368,6 +370,43 @@ namespace Mathijo.Controllers
                 listAllOrdersAndProducts.Add(allOrdersAndOrderedProducts);
             }
             return listAllOrdersAndProducts;
+        }
+
+        [HttpGet("GetOrderedProductsAdmin")]
+        public IEnumerable<object> GetOrderedProductsAdmin(DateTime dateFrom, DateTime dateUntil, Guid idProductType)
+        {
+            List<ProductDataForAllOrderedProducts> listProductDataForAllOrderedProducts = new();
+            List<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>().Where(x => x.Bestelldatum > dateFrom && x.Bestelldatum < dateUntil).ToList();
+            foreach(W_Bestellungen bestellung in bestellungen)
+            {
+                W_Bestellte_Produkte bestellteProdukteTemplate = new();
+                bestellteProdukteTemplate.ID_Bestellung = bestellung.ID;
+                List<W_Bestellte_Produkte> bestellteProdukte = DBHelper.Select(bestellteProdukteTemplate).ToList();
+                foreach(W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
+                {
+                    bool isAlreadyInThere = false;
+                    S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
+                    foreach(ProductDataForAllOrderedProducts forAllOrderedProducts in listProductDataForAllOrderedProducts)
+                    {
+                        if (forAllOrderedProducts.ID_Product == produkt.ID)
+                        {
+                            forAllOrderedProducts.Amount += (int)bestelltesProdukt.Menge;
+                            forAllOrderedProducts.Prize = forAllOrderedProducts.Amount * (decimal)produkt.Preis;
+                            isAlreadyInThere = true;
+                        }
+                    }
+                    if (!isAlreadyInThere)
+                    {
+                        if (produkt.ID_Produkt_Art == idProductType || idProductType == Guid.Empty)
+                        {
+                            decimal totalPrize = (int)bestelltesProdukt.Menge * (decimal)produkt.Preis;
+                            ProductDataForAllOrderedProducts productDataForAllOrderedProducts = new((Guid)produkt.ID, (int)bestelltesProdukt.Menge, produkt.ProduktName, totalPrize);
+                            listProductDataForAllOrderedProducts.Add(productDataForAllOrderedProducts);
+                        }
+                    }
+                }
+            }
+            return listProductDataForAllOrderedProducts;
         }
     }
 }

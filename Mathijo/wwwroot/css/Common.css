@@ -5,3 +5,8 @@
 .tableDiv{
     margin-top: 25px;
 }
+
+.scrollbarCommon {
+    height: 63vh;
+    overflow: auto;
+}
