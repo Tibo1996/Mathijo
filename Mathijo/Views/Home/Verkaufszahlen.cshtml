@@ -3,7 +3,7 @@
 <head>
     <link rel="shortcut icon" href="~/Resources/Mathijo-Icon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="~/css/Umsatz.css" />
+    <link rel="stylesheet" href="~/css/Verkaufszahlen.css" />
     <link rel="stylesheet" href="~/css/Common.css" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <title>Admin - Mathijo</title>
@@ -17,14 +17,46 @@
             <a class="navbar-brand" href="/Home/Tische">Tische</a>
             <a class="navbar-brand" href="/Home/Bestellungen">Bestellungen</a>
             <a class="navbar-brand" href="/Home/BestellteProdukte">Bestellte Produkte</a>
-            <a class="navbar-brand" href="/Home/Umsatz">Umsatz</a>
+            <a class="navbar-brand" href="/Home/Verkaufszahlen">Verkaufszahlen</a>
         </div>
     </nav>
     <div class="container-fluid mainPartOrder">
+        <center><h1>Verkaufszahlen</h1></center>
+        <div style="margin-left: 10px; margin-top: 40px; float: left;">
+            <label><b><u>Übersicht:</u></b></label>
+            <br />
+            <label id="umsatzHeute"></label>
+            <br />
+            <label id="umsatzWoche"></label>
+            <br />
+            <label id="umsatzMonat"></label>
+            <br />
+            <label id="umsatzJahr"></label>
+            <br />
+            <label style="margin-top: 15px;"><b><u>Top 3 meistverkaufte Produktarten:</u></b></label>
+            <br />
+            <label id="top1ProduktArt"></label>
+            <br />
+            <label id="top2ProduktArt"></label>
+            <br />
+            <label id="top3ProduktArt"></label>
+            <br />
+            <label style="margin-top: 15px;"><b><u>Top 3 meistverkaufte Produkte:</u></b></label>
+            <br />
+            <label id="top1Produkt"></label>
+            <br />
+            <label id="top2Produkt"></label>
+            <br />
+            <label id="top3Produkt"></label>
+            <br />
+        </div>
+        <div id="gChart" style="float: right; margin-right: 30px; margin-top: 40px; margin-bottom: 40px;">
+        </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="~/js/Umsatz.js" type="text/javascript"></script>
+    <script src="~/js/Verkaufszahlen.js" type="text/javascript"></script>
     <script src="~/js/ZAModalFramework.js" type="text/javascript"></script>
+    <script src="https://www.gstatic.com/charts/loader.js" type="text/javascript"></script>
 </body>
 </html>

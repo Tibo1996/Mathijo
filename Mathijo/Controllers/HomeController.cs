@@ -42,7 +42,7 @@ namespace Mathijo.Controllers
             return View();
         }
 
-        public IActionResult Umsatz()
+        public IActionResult Verkaufszahlen()
         {
             return View();
         }
