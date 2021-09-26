@@ -288,7 +288,7 @@ namespace Mathijo.Controllers
                     return new ExceptionCheckState("", worked, "Fehler", _Status.Error, DisplayType.DialogOnly);
                 }
             }
-            catch(Exception exc)
+            catch (Exception exc)
             {
                 return new ExceptionCheckState("", exc.Message, "Fehler", _Status.Error, DisplayType.DialogOnly);
             }
@@ -351,14 +351,14 @@ namespace Mathijo.Controllers
         {
             List<AllOrdersAndOrderedProducts> listAllOrdersAndProducts = new();
             List<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>().Where(x => x.Bestelldatum > dateFrom && x.Bestelldatum < dateUntil && x.Abgeschlossen == true).ToList();
-            foreach(W_Bestellungen bestellung in bestellungen)
+            foreach (W_Bestellungen bestellung in bestellungen)
             {
                 W_Bestellte_Produkte bestelltesProduktTemplate = new();
                 bestelltesProduktTemplate.ID_Bestellung = bestellung.ID;
                 List<W_Bestellte_Produkte> listBestellteProdukte = DBHelper.Select(bestelltesProduktTemplate).ToList();
                 List<ProductDataForAllOrders> listProductDataForAllOrders = new();
                 decimal totalPrize = 0;
-                foreach(W_Bestellte_Produkte bestelltesProdukt in listBestellteProdukte)
+                foreach (W_Bestellte_Produkte bestelltesProdukt in listBestellteProdukte)
                 {
                     S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
                     ProductDataForAllOrders productDataForAllOrders = new((int)bestelltesProdukt.Menge, produkt.ProduktName, (decimal)produkt.Preis);
@@ -377,16 +377,16 @@ namespace Mathijo.Controllers
         {
             List<ProductDataForAllOrderedProducts> listProductDataForAllOrderedProducts = new();
             List<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>().Where(x => x.Bestelldatum > dateFrom && x.Bestelldatum < dateUntil).ToList();
-            foreach(W_Bestellungen bestellung in bestellungen)
+            foreach (W_Bestellungen bestellung in bestellungen)
             {
                 W_Bestellte_Produkte bestellteProdukteTemplate = new();
                 bestellteProdukteTemplate.ID_Bestellung = bestellung.ID;
                 List<W_Bestellte_Produkte> bestellteProdukte = DBHelper.Select(bestellteProdukteTemplate).ToList();
-                foreach(W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
+                foreach (W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
                 {
                     bool isAlreadyInThere = false;
                     S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
-                    foreach(ProductDataForAllOrderedProducts forAllOrderedProducts in listProductDataForAllOrderedProducts)
+                    foreach (ProductDataForAllOrderedProducts forAllOrderedProducts in listProductDataForAllOrderedProducts)
                     {
                         if (forAllOrderedProducts.ID_Product == produkt.ID)
                         {
@@ -407,6 +407,35 @@ namespace Mathijo.Controllers
                 }
             }
             return listProductDataForAllOrderedProducts;
+        }
+
+        [HttpGet("GetSales")]
+        public decimal[] GetSales()
+        {
+            decimal[] sales = new decimal[4];
+            sales[0] = this.SaleFinder(DateGetter.DailySalesDates()[0], DateGetter.DailySalesDates()[1]);
+            sales[1] = this.SaleFinder(DateGetter.WeeklySalesDates()[0], DateGetter.WeeklySalesDates()[1]);
+            sales[2] = this.SaleFinder(DateGetter.MonthlySalesDates()[0], DateGetter.MonthlySalesDates()[1]);
+            sales[3] = this.SaleFinder(DateGetter.YearlySalesDates()[0], DateGetter.YearlySalesDates()[1]);
+            return sales;
+        }
+
+        public decimal SaleFinder(DateTime dateFrom, DateTime dateUntil)
+        {
+            decimal totalSales = 0;
+            List<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>().Where(x => x.Bestelldatum > dateFrom && x.Bestelldatum < dateUntil).ToList();
+            foreach (W_Bestellungen bestellung in bestellungen)
+            {
+                W_Bestellte_Produkte bestellteProdukteTemplate = new();
+                bestellteProdukteTemplate.ID_Bestellung = bestellung.ID;
+                List<W_Bestellte_Produkte> bestellteProdukte = DBHelper.Select(bestellteProdukteTemplate).ToList();
+                foreach (W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
+                {
+                    S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
+                    totalSales += (int)bestelltesProdukt.Menge * (decimal)produkt.Preis;
+                }
+            }
+            return totalSales;
         }
     }
 }

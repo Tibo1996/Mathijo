@@ -1,16 +1,26 @@
 ﻿window.onload = init;
 
 function init() {
-    let umsatzHeute = "";
-    let umsatzWoche = "";
-    let umsatzMonat = "";
-    let umsatzJahr = "";
+    let umsatzHeute = 0;
+    let umsatzWoche = 0;
+    let umsatzMonat = 0;
+    let umsatzJahr = 0;
     let top1ProduktArt = "";
     let top2ProduktArt = "";
     let top3ProduktArt = "";
     let top1Produkt = "";
     let top2Produkt = "";
     let top3Produkt = "";
+    $.ajax({
+        url: "/Values/GetSales",
+        async: false,
+        success: function (sales) {
+            umsatzHeute = sales[0].toFixed(2);
+            umsatzWoche = sales[1].toFixed(2);
+            umsatzMonat = sales[2].toFixed(2);
+            umsatzJahr = sales[3].toFixed(2);
+        }
+    })
     $("#umsatzHeute").html("Umsatz heute:<b><span style='margin-left: 100px'>" + umsatzHeute + " €</span></b>");
     $("#umsatzWoche").html("Umsatz diese Woche:<b><span style='margin-left: 51px'>" + umsatzWoche + " €</span></b>");
     $("#umsatzMonat").html("Umsatz diesen Monat:<b><span style='margin-left: 44.5px'>" + umsatzMonat + " €</span></b>");
