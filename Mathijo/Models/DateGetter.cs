@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DatabaseHelper;
+using MathijoAssembly;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -63,6 +65,24 @@ namespace Mathijo.Models
                     break;
             }
             return indexOfStartWeek;
+        }
+
+        public static decimal SaleFinder(DateTime dateFrom, DateTime dateUntil)
+        {
+            decimal totalSales = 0;
+            List<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>().Where(x => x.Bestelldatum > dateFrom && x.Bestelldatum < dateUntil).ToList();
+            foreach (W_Bestellungen bestellung in bestellungen)
+            {
+                W_Bestellte_Produkte bestellteProdukteTemplate = new();
+                bestellteProdukteTemplate.ID_Bestellung = bestellung.ID;
+                List<W_Bestellte_Produkte> bestellteProdukte = DBHelper.Select(bestellteProdukteTemplate).ToList();
+                foreach (W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
+                {
+                    S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
+                    totalSales += (int)bestelltesProdukt.Menge * (decimal)produkt.Preis;
+                }
+            }
+            return totalSales;
         }
     }
 }

@@ -413,17 +413,18 @@ namespace Mathijo.Controllers
         public decimal[] GetSales()
         {
             decimal[] sales = new decimal[4];
-            sales[0] = this.SaleFinder(DateGetter.DailySalesDates()[0], DateGetter.DailySalesDates()[1]);
-            sales[1] = this.SaleFinder(DateGetter.WeeklySalesDates()[0], DateGetter.WeeklySalesDates()[1]);
-            sales[2] = this.SaleFinder(DateGetter.MonthlySalesDates()[0], DateGetter.MonthlySalesDates()[1]);
-            sales[3] = this.SaleFinder(DateGetter.YearlySalesDates()[0], DateGetter.YearlySalesDates()[1]);
+            sales[0] = DateGetter.SaleFinder(DateGetter.DailySalesDates()[0], DateGetter.DailySalesDates()[1]);
+            sales[1] = DateGetter.SaleFinder(DateGetter.WeeklySalesDates()[0], DateGetter.WeeklySalesDates()[1]);
+            sales[2] = DateGetter.SaleFinder(DateGetter.MonthlySalesDates()[0], DateGetter.MonthlySalesDates()[1]);
+            sales[3] = DateGetter.SaleFinder(DateGetter.YearlySalesDates()[0], DateGetter.YearlySalesDates()[1]);
             return sales;
         }
 
-        public decimal SaleFinder(DateTime dateFrom, DateTime dateUntil)
+        [HttpGet("GetTop3OrderedProducts")]
+        public string[] GetTop3OrderedProducts()
         {
-            decimal totalSales = 0;
-            List<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>().Where(x => x.Bestelldatum > dateFrom && x.Bestelldatum < dateUntil).ToList();
+            List<ProductDataForAllOrderedProducts> listProductDataForAllOrderedProducts = new();
+            List<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>().ToList();
             foreach (W_Bestellungen bestellung in bestellungen)
             {
                 W_Bestellte_Produkte bestellteProdukteTemplate = new();
@@ -431,11 +432,76 @@ namespace Mathijo.Controllers
                 List<W_Bestellte_Produkte> bestellteProdukte = DBHelper.Select(bestellteProdukteTemplate).ToList();
                 foreach (W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
                 {
+                    bool isAlreadyInThere = false;
                     S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
-                    totalSales += (int)bestelltesProdukt.Menge * (decimal)produkt.Preis;
+                    foreach (ProductDataForAllOrderedProducts forAllOrderedProducts in listProductDataForAllOrderedProducts)
+                    {
+                        if (forAllOrderedProducts.ID_Product == produkt.ID)
+                        {
+                            forAllOrderedProducts.Amount += (int)bestelltesProdukt.Menge;
+                            forAllOrderedProducts.Prize = forAllOrderedProducts.Amount * (decimal)produkt.Preis;
+                            isAlreadyInThere = true;
+                        }
+                    }
+                    if (!isAlreadyInThere)
+                    {
+                        decimal totalPrize = (int)bestelltesProdukt.Menge * (decimal)produkt.Preis;
+                        ProductDataForAllOrderedProducts productDataForAllOrderedProducts = new((Guid)produkt.ID, (int)bestelltesProdukt.Menge, produkt.ProduktName, totalPrize);
+                        listProductDataForAllOrderedProducts.Add(productDataForAllOrderedProducts);
+                    }
                 }
             }
-            return totalSales;
+            listProductDataForAllOrderedProducts = listProductDataForAllOrderedProducts.OrderBy(x => x.Amount).ToList();
+            return new string[] {listProductDataForAllOrderedProducts[0].ProductName, listProductDataForAllOrderedProducts[1].ProductName, 
+                listProductDataForAllOrderedProducts[2].ProductName};
+        }
+
+        [HttpGet("GetSalesEveryDayOfThisWeek")]
+        public decimal[] GetSalesEveryDayOfThisWeek()
+        {
+            decimal[] salesWholeWeek = new decimal[7];
+            for (int i = 1; i < 8; i++)
+            {
+                List<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>()
+                    .Where(x => x.Bestelldatum > DateGetter.WeeklySalesDates()[0] && x.Bestelldatum < DateGetter.WeeklySalesDates()[0].AddDays(i)).ToList();
+                foreach(W_Bestellungen bestellung in bestellungen)
+                {
+                    W_Bestellte_Produkte bestellteProdukteTemplate = new();
+                    bestellteProdukteTemplate.ID_Bestellung = bestellung.ID;
+                    List<W_Bestellte_Produkte> bestellteProdukte = DBHelper.Select(bestellteProdukteTemplate).ToList();
+                    foreach(W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
+                    {
+                        S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
+                        salesWholeWeek[i - 1] = (int)bestelltesProdukt.Menge * (decimal)produkt.Preis;
+                    }
+                }
+            }
+            return salesWholeWeek;
+        }
+
+        [HttpGet("GetSalesEveryDayOfLastWeek")]
+        public decimal[] GetSalesEveryDayOfLastWeek()
+        {
+            int counter = 0;
+            decimal[] salesWholeWeek = new decimal[7];
+            for (int i = 8; i < 1; i--)
+            {
+                List<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>()
+                    .Where(x => x.Bestelldatum > DateGetter.WeeklySalesDates()[0].AddDays((i - 1) * -1) && x.Bestelldatum < DateGetter.WeeklySalesDates()[0].AddDays((i - 2) * -1)).ToList();
+                foreach (W_Bestellungen bestellung in bestellungen)
+                {
+                    W_Bestellte_Produkte bestellteProdukteTemplate = new();
+                    bestellteProdukteTemplate.ID_Bestellung = bestellung.ID;
+                    List<W_Bestellte_Produkte> bestellteProdukte = DBHelper.Select(bestellteProdukteTemplate).ToList();
+                    foreach (W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
+                    {
+                        S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
+                        salesWholeWeek[counter] = (int)bestelltesProdukt.Menge * (decimal)produkt.Preis;
+                        counter++;
+                    }
+                }
+            }
+            return salesWholeWeek;
         }
     }
 }
