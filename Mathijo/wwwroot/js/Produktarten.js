@@ -8,6 +8,15 @@ var ecsDelete = {
 
 function init() {
     $.ajax({
+        url: "/Values/IsLoggedIn",
+        async: false,
+        success: function (worked) {
+            if (worked === false) {
+                location.href = "/Home/Error";
+            }
+        }
+    })
+    $.ajax({
         url: "/Values/GetAllProductTypes",
         success: function (allProductTypes) {
             for (var i = 0; i < allProductTypes.length; i++) {

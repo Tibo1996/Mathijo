@@ -23,11 +23,13 @@ function Init() {
                 }).appendTo('.allButtonsForDishes');
             }
             $('<button/>', {
+                id: 'adminButton',
                 type: 'button',
                 text: 'Admin',
-                class: 'btn btn-danger btnDishes',
-                onclick: 'GoToAdmin()'
+                class: 'btn btn-danger btnDishes'
             }).appendTo('.allButtonsForDishes');
+            document.getElementById("adminButton").setAttribute("data-toggle", "modal");
+            document.getElementById("adminButton").setAttribute("data-target", "#myModal");
         }
     });
     $.ajax({
@@ -353,6 +355,19 @@ function SetSubTotalToZero() {
     $("#subtotalAmount").html("0.00 €");
 }
 
-function GoToAdmin() {
-    location.href = "/Home/Produktarten";
+function CheckPassword() {
+    let passwordInput = $("#passwordInput").val();
+    $.ajax({
+        type: "Post",
+        url: "/Values/CheckPassword" + "?" + $.param({ "passwordInput": passwordInput }),
+        async: false,
+        success: function (ecs) {
+            if (ecs.code === 2) {
+                requestStatusModal(ecs);
+            }
+            else {
+                location.href = "/Home/Produktarten";
+            }
+        }
+    })
 }

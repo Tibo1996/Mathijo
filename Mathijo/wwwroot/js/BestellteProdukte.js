@@ -4,6 +4,15 @@ let amountOrderedAsc = false;
 
 function init() {
     $.ajax({
+        url: "/Values/IsLoggedIn",
+        async: false,
+        success: function (worked) {
+            if (worked === false) {
+                location.href = "/Home/Error";
+            }
+        }
+    })
+    $.ajax({
         url: "/Values/GetAllProductTypes",
         async: false,
         success: function (allProductTypes) {

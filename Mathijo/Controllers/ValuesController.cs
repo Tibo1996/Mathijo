@@ -2,6 +2,7 @@
 using ExceptionFramework;
 using Mathijo.Models;
 using MathijoAssembly;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -365,7 +366,7 @@ namespace Mathijo.Controllers
                     ProductDataForAllOrders productDataForAllOrders = new((int)bestelltesProdukt.Menge, produkt.ProduktName, (decimal)produkt.Preis);
                     listProductDataForAllOrders.Add(productDataForAllOrders);
                     totalPrize += ((decimal)produkt.Preis * (int)bestelltesProdukt.Menge);
-                    
+
                 }
                 totalSales += totalPrize;
                 S_Tische tisch = DBHelper.SelectByID<S_Tische>((Guid)bestellung.ID_Tisch);
@@ -455,7 +456,7 @@ namespace Mathijo.Controllers
                 }
             }
             listProductDataForAllOrderedProducts = listProductDataForAllOrderedProducts.OrderByDescending(x => x.Amount).ToList();
-            return new string[] {listProductDataForAllOrderedProducts[0].ProductName, listProductDataForAllOrderedProducts[1].ProductName, 
+            return new string[] {listProductDataForAllOrderedProducts[0].ProductName, listProductDataForAllOrderedProducts[1].ProductName,
                 listProductDataForAllOrderedProducts[2].ProductName, listProductDataForAllOrderedProducts[3].ProductName, listProductDataForAllOrderedProducts[4].ProductName};
         }
 
@@ -508,6 +509,39 @@ namespace Mathijo.Controllers
                 counter++;
             }
             return salesWholeWeek;
+        }
+
+        [HttpPost("CheckPassword")]
+        public ExceptionCheckState CheckPassword(string passwordInput)
+        {
+            if (passwordInput == "74545")
+            {
+                HttpContext.Session.SetString("PW", "Success");
+                return new ExceptionCheckState();
+            }
+            else
+            {
+                return new ExceptionCheckState("", "Falsches Passwort", "Fehler", _Status.Error, DisplayType.DialogOnly);
+            }
+        }
+
+        [HttpGet("IsLoggedIn")]
+        public bool IsLoggedIn()
+        {
+            if(HttpContext.Session.GetString("PW") == "Success")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        [HttpGet("RemoveSession")]
+        public void RemoveSession()
+        {
+            HttpContext.Session.Clear();
         }
     }
 }

@@ -1,6 +1,15 @@
 ﻿window.onload = init;
 
 function init() {
+    $.ajax({
+        url: "/Values/IsLoggedIn",
+        async: false,
+        success: function (worked) {
+            if (worked === false) {
+                location.href = "/Home/Error";
+            }
+        }
+    })
     let umsatzHeute = 0;
     let umsatzWoche = 0;
     let umsatzMonat = 0;

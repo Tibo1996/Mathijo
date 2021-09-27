@@ -20,6 +20,15 @@ var ecsPreis = {
 }
 
 function init() {
+    $.ajax({
+        url: "/Values/IsLoggedIn",
+        async: false,
+        success: function (worked) {
+            if (worked === false) {
+                location.href = "/Home/Error";
+            }
+        }
+    })
     CreateSelectBox();
     idOfProductType = $("#my_select option:selected").attr("id");
     $.ajax({

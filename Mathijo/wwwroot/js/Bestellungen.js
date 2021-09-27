@@ -1,4 +1,18 @@
-﻿function GetOrdersBetweenDates() {
+﻿window.onload = init;
+
+function init() {
+    $.ajax({
+        url: "/Values/IsLoggedIn",
+        async: false,
+        success: function (worked) {
+            if (worked === false) {
+                location.href = "/Home/Error";
+            }
+        }
+    })
+}
+
+function GetOrdersBetweenDates() {
     $("#ordersTable").find("tr:gt(0)").remove();
     let dateFrom = $("#dateFrom").val();
     let dateUntil = $("#dateUntil").val();
