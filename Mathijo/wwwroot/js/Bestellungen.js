@@ -6,30 +6,31 @@
         url: "/Values/GetOrdersAndOrderedProducts" + "?" + $.param({ "dateFrom": dateFrom, "dateUntil": dateUntil }),
         async: false,
         success: function (allOrdersAndOrderedProducts) {
-            allOrdersAndOrderedProducts.sort(custom_sort);
-            for (var i = 0; i < allOrdersAndOrderedProducts.length; i++) {
+            allOrdersAndOrderedProducts.orderList.sort(custom_sort);
+            for (var i = 0; i < allOrdersAndOrderedProducts.orderList.length; i++) {
                 $('<tr/>', {
-                    id: allOrdersAndOrderedProducts[i].iD_Order
+                    id: allOrdersAndOrderedProducts.orderList[i].iD_Order
                 }).appendTo('.tableOrders');
                 let createdTD1 = document.createElement("td");
-                createdTD1.innerHTML = "Tisch " + allOrdersAndOrderedProducts[i].tableNumber;
-                document.getElementById(allOrdersAndOrderedProducts[i].iD_Order).appendChild(createdTD1);
+                createdTD1.innerHTML = "Tisch " + allOrdersAndOrderedProducts.orderList[i].tableNumber;
+                document.getElementById(allOrdersAndOrderedProducts.orderList[i].iD_Order).appendChild(createdTD1);
                 let createdTD2 = document.createElement("td");
-                createdTD2.innerHTML = new Date(allOrdersAndOrderedProducts[i].date).toLocaleString();
-                document.getElementById(allOrdersAndOrderedProducts[i].iD_Order).appendChild(createdTD2);
+                createdTD2.innerHTML = new Date(allOrdersAndOrderedProducts.orderList[i].date).toLocaleString();
+                document.getElementById(allOrdersAndOrderedProducts.orderList[i].iD_Order).appendChild(createdTD2);
                 let createdTD3 = document.createElement("td");
                 var wholeProductString = "";
-                for (var j = 0; j < allOrdersAndOrderedProducts[i].orderedProducts.length; j++) {
-                    let totalPrize = allOrdersAndOrderedProducts[i].orderedProducts[j].amount * allOrdersAndOrderedProducts[i].orderedProducts[j].prize;
-                    wholeProductString += allOrdersAndOrderedProducts[i].orderedProducts[j].amount + "x " + allOrdersAndOrderedProducts[i].orderedProducts[j].productName +
+                for (var j = 0; j < allOrdersAndOrderedProducts.orderList[i].orderedProducts.length; j++) {
+                    let totalPrize = allOrdersAndOrderedProducts.orderList[i].orderedProducts[j].amount * allOrdersAndOrderedProducts.orderList[i].orderedProducts[j].prize;
+                    wholeProductString += allOrdersAndOrderedProducts.orderList[i].orderedProducts[j].amount + "x " + allOrdersAndOrderedProducts.orderList[i].orderedProducts[j].productName +
                         "  " + totalPrize.toFixed(2) + " €" + "<br>";
                 }
                 createdTD3.innerHTML = wholeProductString;
-                document.getElementById(allOrdersAndOrderedProducts[i].iD_Order).appendChild(createdTD3);
+                document.getElementById(allOrdersAndOrderedProducts.orderList[i].iD_Order).appendChild(createdTD3);
                 let createdTD4 = document.createElement("td");
-                createdTD4.innerHTML = allOrdersAndOrderedProducts[i].totalPrize.toFixed(2) + " €";
-                document.getElementById(allOrdersAndOrderedProducts[i].iD_Order).appendChild(createdTD4);
+                createdTD4.innerHTML = allOrdersAndOrderedProducts.orderList[i].totalPrize.toFixed(2) + " €";
+                document.getElementById(allOrdersAndOrderedProducts.orderList[i].iD_Order).appendChild(createdTD4);
             }
+            $("#totalSalesInThatTime").html("Gesamtumsatz in dieser Zeit: <b>" + allOrdersAndOrderedProducts.totalSales.toFixed(2) + " €</b>");
         }
     })
 }

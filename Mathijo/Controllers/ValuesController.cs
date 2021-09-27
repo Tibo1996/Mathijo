@@ -347,8 +347,9 @@ namespace Mathijo.Controllers
         }
 
         [HttpGet("GetOrdersAndOrderedProducts")]
-        public IEnumerable<object> GetOrdersAndOrderedProducts(DateTime dateFrom, DateTime dateUntil)
+        public OrderListAndTotalSales GetOrdersAndOrderedProducts(DateTime dateFrom, DateTime dateUntil)
         {
+            decimal totalSales = 0;
             List<AllOrdersAndOrderedProducts> listAllOrdersAndProducts = new();
             List<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>().Where(x => x.Bestelldatum > dateFrom && x.Bestelldatum < dateUntil && x.Abgeschlossen == true).ToList();
             foreach (W_Bestellungen bestellung in bestellungen)
@@ -364,12 +365,14 @@ namespace Mathijo.Controllers
                     ProductDataForAllOrders productDataForAllOrders = new((int)bestelltesProdukt.Menge, produkt.ProduktName, (decimal)produkt.Preis);
                     listProductDataForAllOrders.Add(productDataForAllOrders);
                     totalPrize += ((decimal)produkt.Preis * (int)bestelltesProdukt.Menge);
+                    
                 }
+                totalSales += totalPrize;
                 S_Tische tisch = DBHelper.SelectByID<S_Tische>((Guid)bestellung.ID_Tisch);
                 AllOrdersAndOrderedProducts allOrdersAndOrderedProducts = new((Guid)bestellung.ID, (int)tisch.Tischnummer, (DateTime)bestellung.Bestelldatum, listProductDataForAllOrders, totalPrize);
                 listAllOrdersAndProducts.Add(allOrdersAndOrderedProducts);
             }
-            return listAllOrdersAndProducts;
+            return new OrderListAndTotalSales(listAllOrdersAndProducts, totalSales);
         }
 
         [HttpGet("GetOrderedProductsAdmin")]
@@ -451,9 +454,9 @@ namespace Mathijo.Controllers
                     }
                 }
             }
-            listProductDataForAllOrderedProducts = listProductDataForAllOrderedProducts.OrderBy(x => x.Amount).ToList();
+            listProductDataForAllOrderedProducts = listProductDataForAllOrderedProducts.OrderByDescending(x => x.Amount).ToList();
             return new string[] {listProductDataForAllOrderedProducts[0].ProductName, listProductDataForAllOrderedProducts[1].ProductName, 
-                listProductDataForAllOrderedProducts[2].ProductName};
+                listProductDataForAllOrderedProducts[2].ProductName, listProductDataForAllOrderedProducts[3].ProductName, listProductDataForAllOrderedProducts[4].ProductName};
         }
 
         [HttpGet("GetSalesEveryDayOfThisWeek")]
@@ -463,16 +466,19 @@ namespace Mathijo.Controllers
             for (int i = 1; i < 8; i++)
             {
                 List<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>()
-                    .Where(x => x.Bestelldatum > DateGetter.WeeklySalesDates()[0] && x.Bestelldatum < DateGetter.WeeklySalesDates()[0].AddDays(i)).ToList();
-                foreach(W_Bestellungen bestellung in bestellungen)
+                    .Where(x => x.Bestelldatum > DateGetter.WeeklySalesDates()[0].AddDays(i - 1) && x.Bestelldatum < DateGetter.WeeklySalesDates()[0].AddDays(i)).ToList();
+                if (bestellungen.Any())
                 {
-                    W_Bestellte_Produkte bestellteProdukteTemplate = new();
-                    bestellteProdukteTemplate.ID_Bestellung = bestellung.ID;
-                    List<W_Bestellte_Produkte> bestellteProdukte = DBHelper.Select(bestellteProdukteTemplate).ToList();
-                    foreach(W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
+                    foreach (W_Bestellungen bestellung in bestellungen)
                     {
-                        S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
-                        salesWholeWeek[i - 1] = (int)bestelltesProdukt.Menge * (decimal)produkt.Preis;
+                        W_Bestellte_Produkte bestellteProdukteTemplate = new();
+                        bestellteProdukteTemplate.ID_Bestellung = bestellung.ID;
+                        List<W_Bestellte_Produkte> bestellteProdukte = DBHelper.Select(bestellteProdukteTemplate).ToList();
+                        foreach (W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
+                        {
+                            S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
+                            salesWholeWeek[i - 1] += (int)bestelltesProdukt.Menge * (decimal)produkt.Preis;
+                        }
                     }
                 }
             }
@@ -484,7 +490,7 @@ namespace Mathijo.Controllers
         {
             int counter = 0;
             decimal[] salesWholeWeek = new decimal[7];
-            for (int i = 8; i < 1; i--)
+            for (int i = 8; i > 1; i--)
             {
                 List<W_Bestellungen> bestellungen = DBHelper.SelectAll<W_Bestellungen>()
                     .Where(x => x.Bestelldatum > DateGetter.WeeklySalesDates()[0].AddDays((i - 1) * -1) && x.Bestelldatum < DateGetter.WeeklySalesDates()[0].AddDays((i - 2) * -1)).ToList();
@@ -496,10 +502,10 @@ namespace Mathijo.Controllers
                     foreach (W_Bestellte_Produkte bestelltesProdukt in bestellteProdukte)
                     {
                         S_Produkte produkt = DBHelper.SelectByID<S_Produkte>((Guid)bestelltesProdukt.ID_Produkt);
-                        salesWholeWeek[counter] = (int)bestelltesProdukt.Menge * (decimal)produkt.Preis;
-                        counter++;
+                        salesWholeWeek[counter] += (int)bestelltesProdukt.Menge * (decimal)produkt.Preis;
                     }
                 }
+                counter++;
             }
             return salesWholeWeek;
         }
