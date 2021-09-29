@@ -1,10 +1,15 @@
-﻿.firstRow {
+﻿body {
+    background-color: #121212 !important;
+    color: white !important;
+}
+
+.firstRow {
     margin-top: 0.6%;
 }
 
 .allButtonsForDishes {
     margin-top: 1%;
-    border-top: 2px solid black;
+    border-top: 2px solid #343a40;
     padding-top: 0.8%;
 }
 
@@ -23,7 +28,7 @@
 }
 
 .orderPart {
-    border-left: 1px solid black;
+    border-left: 1px solid #343a40;
 }
 
 .otherOrderPart{
@@ -44,14 +49,14 @@
 }
 
 .productTableBorder {
-    border-top: 2px solid black;
+    border-top: 2px solid #343a40;
     margin-top: 1%;
 }
 
 .orderHeader {
     padding: 2.5%;
     font-size: 1.2rem;
-    border-bottom: 2px solid black;
+    border-bottom: 2px solid #343a40;
 }
 
 .my-custom-scrollbar1 {
@@ -66,9 +71,9 @@
     overflow: auto;
 }
 
-.sumRows{
+.sumRows {
     padding: 2vh 2vh 2vh 2vh;
-    background-color: lightgray;
+    background-color: #343a40;
     border-top: 2px solid black;
     border-bottom: 2px solid black;
     margin-top: 2.8%;

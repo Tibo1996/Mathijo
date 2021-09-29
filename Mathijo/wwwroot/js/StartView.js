@@ -40,7 +40,7 @@ function Init() {
                 $('<button/>', {
                     type: 'button',
                     text: tables[i].tischnummer,
-                    class: 'btn btn-outline-dark btnTables',
+                    class: 'btn btn-dark btnTables',
                     id: tables[i].id,
                     onclick: "SetOrderHeader(this)"
                 }).appendTo('.chooseTable');
@@ -113,7 +113,7 @@ function AddToOrder(button) {
         }
         if (alreadyExists !== true) {
             let orderData = {
-                "ID_Produkt": button.parentElement.parentElement.id, "ID_Bestellung": $(".chooseTable").children(".btn.btn-dark.btnTables")[0].classList[3]
+                "ID_Produkt": button.parentElement.parentElement.id, "ID_Bestellung": $(".chooseTable").children(".btn.btn-warning.btnTables")[0].classList[3]
             }
             $.ajax({
                 type: "Post",
@@ -218,14 +218,14 @@ function SetOrderHeader(button) {
     let allButtonsInfo = $(".btnTables")
     for (var i = 0; i < allButtonsInfo.length; i++) {
         if (allButtonsInfo[i].classList[3] === undefined) {
-            $("#" + allButtonsInfo[i].id).attr("class", "btn btn-outline-dark btnTables");
+            $("#" + allButtonsInfo[i].id).attr("class", "btn btn-dark btnTables");
         }
         else {
-            $("#" + allButtonsInfo[i].id).attr("class", "btn btn-outline-dark btnTables " + allButtonsInfo[i].classList[3]);
+            $("#" + allButtonsInfo[i].id).attr("class", "btn btn-dark btnTables " + allButtonsInfo[i].classList[3]);
         }
 
     }
-    $("#" + button.id).attr("class", "btn btn-dark btnTables " + button.classList[3]);
+    $("#" + button.id).attr("class", "btn btn-warning btnTables " + button.classList[3]);
 
     $(".orderHeader").attr("id", button.id);
     tableOrderNumber = button.innerHTML;
@@ -285,7 +285,7 @@ function DeleteOne(button) {
 function FinishOrder() {
     let allButtonsInfo = $(".btnTables");
     for (var i = 0; i < allButtonsInfo.length; i++) {
-        if ($("#" + allButtonsInfo[i].id).hasClass("btn-dark")) {
+        if ($("#" + allButtonsInfo[i].id).hasClass("btn-warning")) {
             $.ajax({
                 url: "/Values/FinishOrder" + "?" + $.param({ "idOrder": allButtonsInfo[i].classList[3] }),
                 async: false,
