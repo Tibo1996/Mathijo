@@ -35,6 +35,7 @@ function init() {
         type: "Post",
         url: "/Values/GetProductsOfProductType" + "?" + $.param({ "idProductType": idOfProductType }),
         success: function (allProducts) {
+            allProducts.sort((a, b) => (a.produktName > b.produktName) ? 1 : ((b.produktName > a.produktName) ? -1 : 0))
             for (var i = 0; i < allProducts.length; i++) {
                 $('<tr/>', {
                     id: allProducts[i].id
@@ -162,6 +163,7 @@ $("#my_select").change(function () {
         type: "Post",
         url: "/Values/GetProductsOfProductType" + "?" + $.param({ "idProductType": idOfProductType }),
         success: function (allProducts) {
+            allProducts.sort((a, b) => (a.produktName > b.produktName) ? 1 : ((b.produktName > a.produktName) ? -1 : 0))
             for (var i = 0; i < allProducts.length; i++) {
                 $('<tr/>', {
                     id: allProducts[i].id

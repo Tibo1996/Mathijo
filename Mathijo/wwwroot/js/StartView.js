@@ -56,6 +56,14 @@ function Init() {
             }
         }
     });
+    let input = document.getElementById("passwordInput");
+
+    input.addEventListener("keyup", function (event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            document.getElementById("pwButton").click();
+        }
+    });
 }
 
 function GetProducts(button) {
@@ -65,6 +73,7 @@ function GetProducts(button) {
         url: "/Values/GetProductsOfProductType" + "?" + $.param({ "idProductType": button.id }),
         async: false,
         success: function (products) {
+            products.sort((a, b) => (a.produktName > b.produktName) ? 1 : ((b.produktName > a.produktName) ? -1 : 0))
             $(".allButtonsForDishes").css("display", "none");
             $(".allDishes").css("display", "block");
             $(".backButton").css("display", "inline");
