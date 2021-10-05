@@ -1,0 +1,12 @@
+﻿body {
+    margin-top: 10px !important;
+    background-color: #121212 !important;
+    color: white !important;
+}
+
+.newOrdersForTable {
+    width: 20%;
+    min-width: 300px;
+    display: inline-table;
+    margin-right: 30px;
+}

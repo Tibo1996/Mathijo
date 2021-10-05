@@ -51,5 +51,15 @@ namespace Mathijo.Controllers
         {
             return View();
         }
+
+        public IActionResult StartViewSmall()
+        {
+            return View();
+        }
+
+        public IActionResult BestellUebersicht()
+        {
+            return View();
+        }
     }
 }

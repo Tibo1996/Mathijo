@@ -30,6 +30,13 @@ function Init() {
             }).appendTo('.allButtonsForDishes');
             document.getElementById("adminButton").setAttribute("data-toggle", "modal");
             document.getElementById("adminButton").setAttribute("data-target", "#myModal");
+            $('<button/>', {
+                id: 'uebersichtButton',
+                type: 'button',
+                text: 'Übersicht',
+                class: 'btn btn-info btnDishes',
+                onclick: 'GoToOverview()'
+            }).appendTo('.allButtonsForDishes');
         }
     });
     $.ajax({
@@ -379,4 +386,8 @@ function CheckPassword() {
             }
         }
     })
+}
+
+function GoToOverview() {
+    location.href = "/Home/BestellUebersicht";
 }

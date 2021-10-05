@@ -528,7 +528,7 @@ namespace Mathijo.Controllers
         [HttpGet("IsLoggedIn")]
         public bool IsLoggedIn()
         {
-            if(HttpContext.Session.GetString("PW") == "Success")
+            if (HttpContext.Session.GetString("PW") == "Success")
             {
                 return true;
             }
@@ -542,6 +542,40 @@ namespace Mathijo.Controllers
         public void RemoveSession()
         {
             HttpContext.Session.Clear();
+        }
+
+        [HttpGet("GetTableNumberByID")]
+        public int GetTableNumberByID(Guid idTable)
+        {
+            return (int)DBHelper.SelectByID<S_Tische>(idTable).Tischnummer;
+        }
+
+        [HttpGet("GetSortedActiveOrders")]
+        public IEnumerable<object> GetSortedActiveOrders()
+        {
+            List<W_Bestellungen> allActiveOrders = new();
+            List<W_Bestellungen> allOrders = DBHelper.SelectAll<W_Bestellungen>().Where(x => x.Abgeschlossen == false).ToList();
+            foreach(W_Bestellungen order in allOrders)
+            {
+                W_Bestellte_Produkte orderedProductTemplate = new();
+                orderedProductTemplate.ID_Bestellung = order.ID;
+                List<W_Bestellte_Produkte> orderedProducts = DBHelper.Select(orderedProductTemplate).ToList();
+                if (orderedProducts.Any())
+                {
+                    allActiveOrders.Add(order);
+                }
+            }
+            List<W_Bestellungen> orderedList = new();
+            List<S_Tische> allTables = DBHelper.SelectAll<S_Tische>().OrderBy(x => x.Tischnummer).ToList();
+            foreach(S_Tische table in allTables)
+            {
+                W_Bestellungen order = allActiveOrders.Where(x => x.ID_Tisch == table.ID).FirstOrDefault();
+                if(order is not null)
+                {
+                    orderedList.Add(order);
+                }
+            }
+            return orderedList;
         }
     }
 }
