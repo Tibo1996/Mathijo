@@ -16,7 +16,7 @@
 .btnDishes {
     margin: 1%;
     width: 23%;
-    height: 70px;
+    height: 100px;
     white-space: normal;
     word-break: break-word;
 }
@@ -26,20 +26,16 @@
 }
 
 .btnTables {
-    margin: 0.3%;
+    margin: 2%;
 }
 
 .orderPart {
     border-left: 1px solid #343a40;
 }
 
-.otherOrderPart {
-    border-right: 1px solid black;
-}
-
 .backButton {
     float: right;
-    margin: 0.3%;
+    margin: 2%;
 }
 
 .allDishes {
@@ -56,14 +52,15 @@
 }
 
 .orderHeader {
-    padding: 2.5%;
+    padding: 2%;
     font-size: 1.2rem;
     border-bottom: 2px solid #343a40;
+    height: 9%;
 }
 
 .my-custom-scrollbar1 {
     margin-top: 1.5%;
-    height: 75vh;
+    height: 55vh;
     overflow: auto;
 }
 

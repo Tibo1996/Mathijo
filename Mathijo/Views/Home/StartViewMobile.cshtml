@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <link rel="shortcut icon" href="~/Resources/Mathijo-Icon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/css/StartViewMobile.css" />
+    <link rel="stylesheet" href="~/css/Common.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Startseite - Mathijo</title>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row firstRow">
+            <div id="overviewOfProducts" class="otherOrderPart">
+                <div class="chooseTable">
+                    <button type="button" class="btn btn-warning backButton" onclick="ResetPage()" style="display: none"><b>Zurück</b></button>
+                </div>
+                <div class="allButtonsForDishes">
+                </div>
+                <div class="allDishes my-custom-scrollbar1">
+                    <table class="table table-dark table-striped table-hover productTable productTableBorder" style="table-layout: fixed; word-wrap: break-word;">
+                        <thead>
+                            <tr>
+                                <th scope="col" width="65%">Name</th>
+                                <th scope="col" width="20%">Preis</th>
+                                <th scope="col" width="15%"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="tableBodyProducts">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="overviewOfTable" class="orderPart" style="display: none" ;>
+                <div id="idOfOrder" class="orderHeader">
+                    <div style="float: left;">
+                        <span><b>Tisch-Nr.</b></span>
+                    </div>
+                    <div style="float: right;">
+                        <button class="btn btn-warning" onclick="GoToStart()"><b>Zurück</b></button>
+                    </div>
+                </div>
+                <div class="tableOrder my-custom-scrollbar2">
+                    <table id="rightSideTable" class="table table-dark table-hover productTable" style="table-layout: fixed; word-wrap: break-word;">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width: 18%"></th>
+                                <th scope="col" style="width: 50%">Name</th>
+                                <th scope="col" style="width: 25%">Preis</th>
+                                <th scope="col" style="width: 18%"></th>
+                                <th scope="col" style="width: 22%"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="tableBodyOrderedProducts">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row sumRows">
+                    <div class="col" style="margin-top: 5px;">
+                        <b>Zwischensumme:</b>
+                    </div>
+                    <div id="subtotalAmount" class="col" style="margin-top: 5px;">
+                        0.00 €
+                    </div>
+                    <div class="col">
+                        <button type="button" class="btn btn-info" onclick="ClearSubTotal()">Bezahlen</button>
+                    </div>
+                </div>
+                <div class="row sumRows">
+                    <div class="col" style="margin-top: 5px;">
+                        <b>Gesamtsumme:</b>
+                    </div>
+                    <div id="totalAmount" class="col" style="margin-top: 5px;">
+                        0.00 €
+                    </div>
+                    <div class="col">
+                        <button type="button" class="btn btn-success" onclick="FinishOrder()">Abschließen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="seeTableInfo">
+            <div class="row sumRows">
+                <div class="col" style="margin-top: 5px;">
+                    <b>Summe:</b>
+                </div>
+                <div id="totalAmountOverview" class="col" style="margin-top: 5px;">
+                    0.00 €
+                </div>
+                <div class="col">
+                    <button type="button" class="btn btn-primary" onclick="GoToTable()">Anzeigen</button>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="myModal">
+            <div class="modal-dialog">
+                <div class="modal-content" style="background-color: #ffc107; color: black; ">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Melden Sie sich an für die Admin Ansicht</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <label style="margin-right: 15px;">Passwort: </label><input id="passwordInput" type="password" placeholder="Passwort eingeben" />
+                    </div>
+                    <div class="modal-footer">
+                        <button id="pwButton" type="button" class="btn btn-primary" data-dismiss="modal" onclick="CheckPassword()">Login</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="~/js/StartViewMobile.js" type="text/javascript"></script>
+    <script src="~/js/ZAModalFramework.js" type="text/javascript"></script>
+</body>
+</html>

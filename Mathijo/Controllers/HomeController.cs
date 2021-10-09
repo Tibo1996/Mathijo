@@ -52,12 +52,17 @@ namespace Mathijo.Controllers
             return View();
         }
 
+        public IActionResult BestellUebersicht()
+        {
+            return View();
+        }
+
         public IActionResult StartViewSmall()
         {
             return View();
         }
 
-        public IActionResult BestellUebersicht()
+        public IActionResult StartViewMobile()
         {
             return View();
         }
